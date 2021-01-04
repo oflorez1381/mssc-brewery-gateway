@@ -7,21 +7,21 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Profile("!local-discovery")
-public class LocalHostRouteConfig {
+@Profile("local-discovery")
+public class LoadBalancedRoutesConfig {
 
     @Bean
-    public RouteLocator localHostRoutes(RouteLocatorBuilder builder){
+    public RouteLocator loadBalancedRoutes(RouteLocatorBuilder builder){
         return builder.routes()
                 .route("beer-service",
                         r -> r.path("/api/v1/beer*", "/api/v1/beer/*", "/api/v1/beerUpc/*")
-                                .uri("http://localhost:8081"))
+                                .uri("lb://beer-service"))
                 .route("order-service",
                         r -> r.path("/api/v1/customers/**")
-                        .uri("http://localhost:8082"))
+                                .uri("lb://order-service"))
                 .route("inventory-service",
                         r -> r.path("/api/v1/beer/*/inventory")
-                        .uri("http://localhost:8083"))
+                                .uri("lb://inventory-service"))
                 .build();
     }
 
